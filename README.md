@@ -15,7 +15,7 @@ npm install react-native-use-responsive-styles
 import { useResponsiveStyles } from 'react-native-use-responsive-styles';
 
 const MyView = () => {
-  const styles = await useResponsiveStyles({
+  const styles = useResponsiveStyles({
     // base styles, always applied but can be overwritten
     base: {
       container: {

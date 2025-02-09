@@ -54,7 +54,7 @@
     "type": "git",
     "url": "git+https://github.com/zacharytyhacz/react-native-use-responsive-styles.git"
   },
-  "author": "zacharytyhacz <zactyh@gmail.com> (https://github.com/zacharytyhacz)",
+  "author": "zacharytyhacz",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zacharytyhacz/react-native-use-responsive-styles/issues"
@@ -186,6 +186,6 @@
   },
   "release": {
     "branches": ["main"],
-    "preset": "angular"
+    "preset": "conventionalcommits"
   }
 }
