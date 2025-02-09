@@ -1,47 +1,63 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 
 import {
   useWindowDimensions,
   StyleSheet,
-  type StyleProp,
   type ViewStyle,
   type TextStyle,
   type ImageStyle,
 } from 'react-native';
 
-type Props = {
-  shared?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
-  mobile?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
-  tablet?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
-  desktop?: StyleProp<ViewStyle | TextStyle | ImageStyle>;
+const BREAKPOINTS = {
+  mobile: 0,
+  tablet: 768,
+  desktop: 1024,
 };
 
-export function useResponsiveStyles(
-  props: Props
-): StyleProp<ViewStyle | TextStyle | ImageStyle> {
+type StyleObject = ViewStyle | TextStyle | ImageStyle;
+
+type ResponsiveStyles<T extends Record<string, StyleObject>> = {
+  base: T;
+  mobile?: Partial<{ [K in keyof T]: StyleObject }>;
+  tablet?: Partial<{ [K in keyof T]: StyleObject }>;
+  desktop?: Partial<{ [K in keyof T]: StyleObject }>;
+};
+
+export function useResponsiveStyles<T extends Record<string, StyleObject>>(
+  styles: ResponsiveStyles<T>
+) {
   const { width } = useWindowDimensions();
 
-  const styles = useMemo(() => {
-    const { shared, mobile, tablet, desktop } = props;
+  const mergeStyles = useCallback(
+    (base: T, override?: Partial<{ [K in keyof T]: StyleObject }>): T => {
+      const result: Partial<T> = { ...base };
 
-    const stylesToBe = [shared];
+      if (override) {
+        for (const key in base) {
+          result[key] = { ...base[key], ...(override[key] || {}) };
+        }
+      }
 
-    if (width < 768) {
-      stylesToBe.push(mobile);
+      return result as T;
+    },
+    []
+  );
+
+  const generatedStyles = useMemo(() => {
+    let responsiveStyles: T = styles.base;
+
+    if (width >= BREAKPOINTS.tablet && styles.tablet) {
+      responsiveStyles = mergeStyles(responsiveStyles, styles.tablet);
+    }
+    if (width >= BREAKPOINTS.desktop && styles.desktop) {
+      responsiveStyles = mergeStyles(responsiveStyles, styles.desktop);
+    }
+    if (width < BREAKPOINTS.tablet) {
+      responsiveStyles = mergeStyles(responsiveStyles, styles.mobile);
     }
 
-    if (width >= 768 && width < 1024) {
-      stylesToBe.push(tablet);
-    }
+    return StyleSheet.create(responsiveStyles) as T;
+  }, [width, styles, mergeStyles]);
 
-    if (width >= 1024) {
-      stylesToBe.push(desktop);
-    }
-
-    const style = StyleSheet.flatten(stylesToBe);
-
-    return style;
-  }, [props, width]);
-
-  return styles;
+  return generatedStyles;
 }

@@ -1,6 +1,6 @@
 # react-native-use-responsive-styles
 
-Simple helpful hook to have different styles based screensize
+Simple helpful hook to have different styles based on screen size
 
 ## Installation
 
@@ -11,12 +11,58 @@ npm install react-native-use-responsive-styles
 ## Usage
 
 
-```js
-import { multiply } from 'react-native-use-responsive-styles';
+```tsx
+import { useResponsiveStyles } from 'react-native-use-responsive-styles';
 
-// ...
+const MyView = () => {
+  const styles = await useResponsiveStyles({
+    // base styles, always applied but can be overwritten
+    base: {
+      container: {
+        flex: 1
+      },
+      label: {
+        color: 'red'
+      }
+    },
 
-const result = await multiply(3, 7);
+    // less than 768px pixels
+    mobile: {
+      container: {
+        flexDirection: 'column',
+        marginTop: 16
+      },
+      label: {
+        textAlign: 'center',
+        fontSize: 18
+      }
+    },
+
+    // between 768px and up
+    tablet: {
+      container: {
+        padding: 12,
+        flexDirection: 'row'
+      }
+    },
+
+    // greater than 1024px
+    desktop: {
+      container: {
+        padding: 16
+      },
+      label: {
+        fontSize: 24
+      }
+    }
+  })
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>Responsive styles</Text>
+    </View>
+  )
+}
 ```
 
 
